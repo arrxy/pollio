@@ -7,6 +7,10 @@ use std::{io, os::fd::RawFd, ptr};
 
 const MAX_EVENTS: usize = 20_000;
 
+/// macOS `kqueue` backend implementing [`Poller`](crate::Poller).
+///
+/// Holds up to 20,000 events per [`wait`](Poller::wait) call. The underlying kqueue FD is closed
+/// on drop.
 pub struct OsPoller {
     kqueue_fd: RawFd,
     events: Vec<kevent>,

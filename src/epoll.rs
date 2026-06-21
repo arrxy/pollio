@@ -8,6 +8,10 @@ use std::ptr;
 
 const MAX_EVENTS: usize = 20_000;
 
+/// Linux `epoll` backend implementing [`Poller`](crate::Poller).
+///
+/// Holds up to 20,000 events per [`wait`](Poller::wait) call. The underlying epoll FD is closed
+/// on drop.
 pub struct OsPoller {
     epoll_fd: RawFd,
     events: Vec<epoll_event>,

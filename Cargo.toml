@@ -8,7 +8,12 @@ repository = "https://github.com/arrxy/pollio"
 readme = "README.md"
 keywords = ["poll", "epoll", "kqueue", "event-loop", "io"]
 categories = ["network-programming", "os"]
+documentation = "https://docs.rs/pollio"
 
+[package.metadata.docs.rs]
+all-features = true
+targets = ["x86_64-unknown-linux-gnu", "aarch64-apple-darwin"]
+rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 
