@@ -1,0 +1,19 @@
+[package]
+name = "pollio"
+version = "0.1.0"
+edition = "2021"
+description = "A small native event poller abstraction over epoll and kqueue"
+license = "MIT"
+repository = "https://github.com/arrxy/pollio"
+readme = "README.md"
+keywords = ["poll", "epoll", "kqueue", "event-loop", "io"]
+categories = ["network-programming", "os"]
+
+
+[dependencies]
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+libc = "0.2"
