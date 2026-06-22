@@ -15,6 +15,7 @@ const MAX_EVENTS: usize = 20_000;
 pub struct OsPoller {
     epoll_fd: RawFd,
     events: Vec<epoll_event>,
+    ready: Vec<EventObject>,
 }
 
 impl Poller for OsPoller {
@@ -24,7 +25,12 @@ impl Poller for OsPoller {
             return Err(io::Error::last_os_error());
         }
         let events = vec![epoll_event { events: 0, u64: 0 }; MAX_EVENTS];
-        Ok(Self { epoll_fd, events })
+        let ready = Vec::with_capacity(MAX_EVENTS);
+        Ok(Self {
+            epoll_fd,
+            events,
+            ready,
+        })
     }
 
     fn add(&self, event_object: EventObject) -> io::Result<()> {
@@ -49,7 +55,7 @@ impl Poller for OsPoller {
         Ok(())
     }
 
-    fn wait(&mut self, timeout_ms: i32) -> io::Result<Vec<EventObject>> {
+    fn wait(&mut self, timeout_ms: i32) -> io::Result<&[EventObject]> {
         let nevents = unsafe {
             epoll_wait(
                 self.epoll_fd,
@@ -62,12 +68,12 @@ impl Poller for OsPoller {
         if nevents == -1 {
             return Err(io::Error::last_os_error());
         }
-        let mut ready = Vec::with_capacity(nevents as usize);
+        self.ready.clear();
         for i in 0..nevents as usize {
             let data = self.events[i].u64 as usize;
-            ready.push(EventObject::decode(data));
+            self.ready.push(EventObject::decode(data));
         }
-        Ok(ready)
+        Ok(&self.ready)
     }
 }
 

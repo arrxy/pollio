@@ -23,8 +23,9 @@ pub trait Poller {
 
     /// Block until at least one registered FD is readable, or the timeout elapses.
     ///
-    /// Returns a vector of ready [`EventObject`]s. An empty vector means the call timed out with
-    /// no events.
+    /// Returns a slice of ready [`EventObject`]s, backed by a buffer owned by the poller and
+    /// reused across calls. An empty slice means the call timed out with no events. The slice is
+    /// only valid until the next call to `wait`.
     ///
     /// # Timeout
     ///
@@ -33,5 +34,5 @@ pub trait Poller {
     /// | `-1`  | Block indefinitely |
     /// | `0`   | Poll without blocking |
     /// | `> 0` | Timeout in milliseconds |
-    fn wait(&mut self, timeout_ms: i32) -> io::Result<Vec<EventObject>>;
+    fn wait(&mut self, timeout_ms: i32) -> io::Result<&[EventObject]>;
 }

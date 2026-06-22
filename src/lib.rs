@@ -50,6 +50,8 @@
 //! - **Thread safety** — [`OsPoller`] is not [`Sync`]; typical use is a single thread driving the
 //!   event loop.
 //! - **Error handling** — syscalls surface as [`std::io::Error`] via `last_os_error()`.
+//! - **No per-call allocation** — [`Poller::wait`] returns a slice backed by a buffer owned by
+//!   the poller and reused across calls; it is valid only until the next `wait` call.
 
 #![deny(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_cfg))]

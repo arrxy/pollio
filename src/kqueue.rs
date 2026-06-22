@@ -14,6 +14,7 @@ const MAX_EVENTS: usize = 20_000;
 pub struct OsPoller {
     kqueue_fd: RawFd,
     events: Vec<kevent>,
+    ready: Vec<EventObject>,
 }
 
 impl Poller for OsPoller {
@@ -23,7 +24,12 @@ impl Poller for OsPoller {
             return Err(io::Error::last_os_error());
         }
         let events = vec![unsafe { std::mem::zeroed::<kevent>() }; MAX_EVENTS];
-        Ok(Self { kqueue_fd, events })
+        let ready = Vec::with_capacity(MAX_EVENTS);
+        Ok(Self {
+            kqueue_fd,
+            events,
+            ready,
+        })
     }
 
     fn add(&self, event: EventObject) -> Result<(), std::io::Error> {
@@ -76,7 +82,7 @@ impl Poller for OsPoller {
         Ok(())
     }
 
-    fn wait(&mut self, timeout_ms: i32) -> io::Result<Vec<EventObject>> {
+    fn wait(&mut self, timeout_ms: i32) -> io::Result<&[EventObject]> {
         let timeout_storage;
 
         let timeout_ptr: *const timespec = if timeout_ms < 0 {
@@ -105,15 +111,15 @@ impl Poller for OsPoller {
             return Err(io::Error::last_os_error());
         }
 
-        let mut ready = Vec::with_capacity(nevents as usize);
+        self.ready.clear();
 
         for i in 0..nevents as usize {
             let data = self.events[i].udata as usize;
             let event = EventObject::decode(data);
 
-            ready.push(event);
+            self.ready.push(event);
         }
-        Ok(ready)
+        Ok(&self.ready)
     }
 }
 

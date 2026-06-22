@@ -11,6 +11,7 @@ Use it as a building block for event-driven servers, custom async runtimes, or a
 - **User data tagging** — attach a lightweight `EventKind` (e.g. server vs. client socket) to each registered FD; it round-trips through the kernel and comes back on wake.
 - **Zero runtime dependencies** — only `libc` on supported platforms; no async executor required.
 - **Large event batch** — up to 20,000 events per `wait` call.
+- **No per-call allocation** — `wait` returns a slice backed by a buffer reused across calls.
 
 ## Supported platforms
 
@@ -71,7 +72,7 @@ fn main() -> std::io::Result<()> {
 | `new()` | Create a new OS poller instance. |
 | `add(event)` | Register an FD for **read** readiness. |
 | `delete(fd)` | Remove an FD from the poller. |
-| `wait(timeout_ms)` | Block until events are ready. Returns a `Vec<EventObject>`. |
+| `wait(timeout_ms)` | Block until events are ready. Returns a `&[EventObject]` backed by a reused internal buffer, valid until the next `wait` call. |
 
 **Timeout:** pass `-1` to block indefinitely, `0` to poll without blocking, or a positive value for a timeout in milliseconds.
 
