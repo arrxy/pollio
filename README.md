@@ -1,4 +1,7 @@
 # pollio
+[![Crates.io](https://img.shields.io/crates/v/pollio.svg)](https://crates.io/crates/pollio)
+[![Docs.rs](https://docs.rs/pollio/badge.svg)](https://docs.rs/pollio)
+[![License](https://img.shields.io/crates/l/pollio.svg)](https://crates.io/crates/pollio)
 
 A minimal, cross-platform event poller for Linux and macOS. **pollio** wraps native readiness APIs — [epoll](https://man7.org/linux/man-pages/man7/epoll.7.html) on Linux and [kqueue](https://www.freebsd.org/cgi/man.cgi?query=kqueue) on macOS — behind a small, uniform Rust trait.
 
